@@ -22,7 +22,8 @@ def get_info_from_API(api_url, user_animal):
         animals = response.json()
         return animals
     else:
-        print("Error:", response.status_code, response.text)
+        error_message = "Error:", response.status_code, response.text
+        return error_message
 
 
 """creates the string of all the info for each 
@@ -47,31 +48,31 @@ def main():
     with open("animals_template.html", 'r', encoding='utf-8') as html_file:
         html_content = html_file.read()
 
-    while True:
-        try:
-            user_animal = get_user_input()
-            api_url = 'https://api.api-ninjas.com/v1/animals?name={}'.format(user_animal)
+        user_animal = get_user_input()
+        api_url = 'https://api.api-ninjas.com/v1/animals?name={}'.format(user_animal)
 
-            animals_data = get_info_from_API(api_url, user_animal)
-            if len(animals_data) > 0:
-                output = ''
-                for animal in animals_data:
-                    output += serialize_animal(animal)
+        animals_data = get_info_from_API(api_url, user_animal)
+        if len(animals_data) > 0:
+            output = ''
+            for animal in animals_data:
+                output += serialize_animal(animal)
 
-                html_content = html_content.replace("__REPLACE_ANIMALS_INFO__", output)
+            html_content = html_content.replace("__REPLACE_ANIMALS_INFO__", output)
 
-                with open("animals.html", 'w') as new_file:
-                    new_file.write(html_content)
+            with open("animals.html", 'w') as new_file:
+                new_file.write(html_content)
+            print("\nWebsite was successfully generated to the file animals.html.")
 
-                print("\nWebsite was successfully generated to the file animals.html.")
-                break
-            else:
-                print()
-                raise ValueError(f"Error: Unfortunately {user_animal} was not found in the list of animals. Try again.")
-                continue
+        else:
+            error_message = f"<h2>Error! The animal {user_animal} doesn't exist. Please check if it's correctly written and in english!</h2>"
+            html_content = html_content.replace("__REPLACE_ANIMALS_INFO__", error_message)
 
-        except ValueError as e:
-            print(e)
+            with open("animals.html", 'w') as new_file:
+                new_file.write(html_content)
+
+            print(f"Error: Unfortunately {user_animal} was not found in the list of animals. Try again.")
+
+
 
 
 
