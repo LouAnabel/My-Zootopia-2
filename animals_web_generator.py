@@ -1,4 +1,7 @@
 import json
+import requests
+
+
 
 """creates the string of all the info for each 
 animal that will be added to the json and displayed on the website"""
@@ -17,15 +20,30 @@ def serialize_animal(animal):
     output += "</li>"
     return output
 
+def get_user_input():
+    user_input = input("Please enter the animal you want to search for: ")
+    return user_input
+
+def get_info_from_API(api_url, user_animal):
+    response = requests.get(api_url, headers={'X-Api-Key': 'q9r48ssh7l6bFIW9jifEIQ==L3BwmkN4TTAnt5Qg'})
+    if response.status_code == requests.codes.ok:
+        animals = response.json()
+        return animals
+    else:
+        error_message = "Error:", response.status_code, response.text
+        return error_message
+
 def main():
+    user_animal = get_user_input()
+    api_url = 'https://api.api-ninjas.com/v1/animals?name={}'.format(user_animal)
+
     with open("animals_template.html", 'r', encoding='utf-8') as html_file:
         html_content = html_file.read()
 
-    def load_data(file_path):
-        with open(file_path, "r") as file:
-            return json.load(file)
+    animals_data = get_info_from_API(api_url, user_animal)
+    print("Website was successfully generated to the file animals.html.")
+    print(animals_data)
 
-    animals_data = load_data('animals_data.json')
 
     output = ''
     for animal in animals_data:
